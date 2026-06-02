@@ -568,8 +568,8 @@ async function seed() {
     email: "admin@example.com",
     password,
     role: "admin",
-    first_name: "Sreypok",
-    last_name: "DOEM",
+    first_name: "Lyden",
+    last_name: "Chai",
     phone: "012 345 678",
     address: {
       street: "Norodom Blvd",

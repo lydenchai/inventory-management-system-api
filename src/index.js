@@ -79,7 +79,7 @@ app.use("/api/expenses", expenseRoutes);
 
 // Health check
 app.get("/", (req, res) => {
-  res.json({ message: "IMS-G6 Backend is running." });
+  res.json({ message: "IMS Backend is running." });
 });
 
 // Serve static files from the uploads directory

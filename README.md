@@ -1,6 +1,6 @@
-# IMS-G6 Backend
+# Inventory Management System Backend
 
-Node.js backend for Inventory Management System (Group 6) using Express, Sequelize, and MySQL.
+Node.js backend for Inventory Management System using Express, Sequelize, and MySQL.
 
 ## Prerequisites
 
@@ -11,8 +11,8 @@ Node.js backend for Inventory Management System (Group 6) using Express, Sequeli
 
 1. **Clone the repository**
    ```sh
-   git clone "https://github.com/SreypokD/IMS_G6_backend"
-   cd IMS_G6_backend
+   git clone "https://github.com/lydenchai/inventory-management-system-api"
+   cd inventory-management-system-api
    ```
 2. **Copy environment file**
    ```sh
@@ -165,7 +165,7 @@ Authorization: Bearer <access_token>
 
 ## Frontend
 
-See [IMS-G6-frontend](https://github.com/SreypokD/IMS_G6_frontend) for frontend setup and usage.
+See [inventory-management-system-admin](https://github.com/lydenchai/inventory-management-system-admin) for frontend setup and usage.
 
 ## Notes
 

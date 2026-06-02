@@ -1,7 +1,7 @@
 {
-  "name": "ims-g6-backend",
+  "name": "inventory-management-system-api",
   "version": "1.0.0",
-  "description": "Inventory Management System Backend - Group 6",
+  "description": "Inventory Management System Backend",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
