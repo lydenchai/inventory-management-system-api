@@ -37,6 +37,14 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    min_stock_level: {
+      type: Number,
+      default: 10,
+    },
+    low_stock_notified: {
+      type: Boolean,
+      default: false,
+    },
     category_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',

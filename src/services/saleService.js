@@ -3,6 +3,7 @@ const Sale = require("../models/Sale");
 const SaleItem = require("../models/SaleItem");
 const Product = require("../models/Product");
 const Stock = require("../models/Stock");
+const emailService = require("./emailService");
 
 class SaleService {
   async getAll({ page = 1, limit = 10, start_date, end_date, customer, status, search }) {
@@ -206,6 +207,7 @@ class SaleService {
         const newStock = product.stock - quantity;
         product.stock = newStock;
         await product.save({ session });
+        await emailService.checkAndAlertLowStock(product, session);
 
         const subtotal = price * quantity * (1 - discount / 100);
         totalAmount += subtotal;
@@ -279,6 +281,7 @@ class SaleService {
           if (product) {
             product.stock = product.stock + item.quantity;
             await product.save({ session });
+            await emailService.checkAndAlertLowStock(product, session);
 
             await Stock.create(
               [{
@@ -319,6 +322,7 @@ class SaleService {
           const newStock = product.stock - quantity;
           product.stock = newStock;
           await product.save({ session });
+          await emailService.checkAndAlertLowStock(product, session);
 
           await SaleItem.create(
             [{
@@ -398,6 +402,7 @@ class SaleService {
           if (product) {
             product.stock = product.stock + item.quantity;
             await product.save({ session });
+            await emailService.checkAndAlertLowStock(product, session);
 
             await Stock.create(
               [{

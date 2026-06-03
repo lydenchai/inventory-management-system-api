@@ -60,6 +60,10 @@ const salesRoutes = require("./routes/sales");
 const stockRoutes = require("./routes/stocks");
 const notificationsRoutes = require("./routes/notifications");
 const expenseRoutes = require("./routes/expenses");
+const locationRoutes = require("./routes/location");
+const stockTransferRoutes = require("./routes/stockTransfers");
+const purchaseOrderRoutes = require("./routes/purchaseOrder");
+const returnRoutes = require("./routes/return");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
@@ -76,6 +80,10 @@ app.use("/api/password-reset", passwordResetRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/expenses", expenseRoutes);
+app.use("/api/locations", locationRoutes);
+app.use("/api/stock-transfers", stockTransferRoutes);
+app.use("/api/purchase-orders", purchaseOrderRoutes);
+app.use("/api/returns", returnRoutes);
 
 // Health check
 app.get("/", (req, res) => {

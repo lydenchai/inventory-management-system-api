@@ -1,5 +1,7 @@
 const supplierService = require("../services/supplierService");
 const { validationResult } = require("express-validator");
+const csv = require("csv-parser");
+const { Readable } = require("stream");
 
 exports.getAll = async (req, res) => {
   try {
@@ -64,4 +66,58 @@ exports.remove = async (req, res) => {
     }
     res.status(500).json({ success: false, error: err.message });
   }
+};
+
+exports.importSuppliers = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: "No CSV file uploaded." });
+  }
+
+  const results = [];
+  const stream = Readable.from(req.file.buffer);
+
+  stream
+    .pipe(csv())
+    .on('data', (data) => results.push(data))
+    .on('end', async () => {
+      try {
+        let importedCount = 0;
+        let errorCount = 0;
+        const errors = [];
+
+        for (const [index, row] of results.entries()) {
+          try {
+            const supplierData = {
+              company_name: row.company_name,
+              contact_person: row.contact_person,
+              email: row.email,
+              phone: row.phone,
+              address: row.address || "",
+              status: row.status || "active"
+            };
+
+            if (!supplierData.company_name) {
+              throw new Error("Company name is required.");
+            }
+
+            await supplierService.create(supplierData);
+            importedCount++;
+          } catch (err) {
+            errorCount++;
+            errors.push(`Row ${index + 2}: ${err.message}`);
+          }
+        }
+
+        res.json({
+          success: true,
+          message: `Import complete. Successfully imported: ${importedCount}, Failed: ${errorCount}.`,
+          errors: errors.length > 0 ? errors : undefined
+        });
+      } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+      }
+    })
+    .on('error', (err) => {
+      res.status(500).json({ success: false, error: "Failed to parse CSV: " + err.message });
+    });
 };

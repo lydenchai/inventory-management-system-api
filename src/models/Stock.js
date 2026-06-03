@@ -34,8 +34,13 @@ const stockSchema = new mongoose.Schema(
       enum: ['Purchase', 'Sale', 'Return', 'Adjustment', 'Damage', 'Other'],
       default: null,
     },
-    location: {
-      type: String,
+    location_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Location',
+      default: null,
+    },
+    expiry_date: {
+      type: Date,
       default: null,
     },
     notes: {
