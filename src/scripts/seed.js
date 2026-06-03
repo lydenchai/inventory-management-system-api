@@ -17,6 +17,9 @@ const ApproveRequest = require("../models/ApproveRequest");
 const Sale = require("../models/Sale");
 const SaleItem = require("../models/SaleItem");
 const Expense = require("../models/Expense");
+const PurchaseOrder = require("../models/PurchaseOrder");
+const Return = require("../models/Return");
+const Location = require("../models/Location");
 
 async function seed() {
   await connectDB();
@@ -166,6 +169,14 @@ async function seed() {
       description: "Healthcare products and equipment",
       status: "active",
     },
+  ]);
+
+  // Seed locations
+  const locations = await Location.insertMany([
+    { name: "Main Warehouse", address: "123 Logistics Way, Phnom Penh" },
+    { name: "Store A (Toul Kork)", address: "Toul Kork, Phnom Penh" },
+    { name: "Store B (BKK1)", address: "BKK1, Phnom Penh" },
+    { name: "Storage Annex", address: "456 Secondary St, Phnom Penh" },
   ]);
 
   // Seed suppliers
@@ -1159,10 +1170,88 @@ async function seed() {
     order_request_id: completedOrder2._id,
     status: "approved",
     admin_remarks:
-      "Marketing event approved. Ensure branded items are quality-checked prior to the event.",
+      "Approved for marketing budget.",
     approved_by: adminUser._id,
     approved_date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
   });
+
+  // Generate Purchase Orders for the approved and completed requests
+  const purchaseOrders = await PurchaseOrder.create([
+    {
+      po_number: "PO-" + Math.floor(100000 + Math.random() * 900000),
+      order_request_id: approvedOrder._id,
+      supplier_id: approvedOrder.supplier_id,
+      issue_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      status: "issued",
+      total_amount: 1500, // mock amount
+      notes: "Please deliver before Friday.",
+      created_by: adminUser._id,
+    },
+    {
+      po_number: "PO-" + Math.floor(100000 + Math.random() * 900000),
+      order_request_id: completedOrder._id,
+      supplier_id: completedOrder.supplier_id,
+      issue_date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+      status: "acknowledged",
+      total_amount: 2500, // mock amount
+      notes: "Deliver to Floor 2.",
+      created_by: adminUser._id,
+    },
+    {
+      po_number: "PO-" + Math.floor(100000 + Math.random() * 900000),
+      order_request_id: completedOrder2._id,
+      supplier_id: completedOrder2.supplier_id,
+      issue_date: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000),
+      status: "sent",
+      total_amount: 800, // mock amount
+      notes: "For Cambodia Trade Fair.",
+      created_by: adminUser._id,
+    }
+  ]);
+
+  // Seed Returns (RMA)
+  await Return.create([
+    {
+      return_number: "RMA-" + Math.floor(100000 + Math.random() * 900000),
+      type: "customer_return",
+      sale_id: null,
+      supplier_id: null,
+      status: "processed",
+      items: [
+        {
+          product_id: products[0]._id,
+          quantity: 1,
+          unit_price: products[0].price,
+          reason: "defective",
+          condition: "damaged",
+        }
+      ],
+      total_amount: products[0].price,
+      processed_by: adminUser._id,
+      notes: "Customer found defect in screen.",
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+    },
+    {
+      return_number: "RMA-" + Math.floor(100000 + Math.random() * 900000),
+      type: "supplier_return",
+      sale_id: null,
+      supplier_id: suppliers[0]._id,
+      status: "pending",
+      items: [
+        {
+          product_id: products[0]._id,
+          quantity: 1,
+          unit_price: products[0].price,
+          reason: "defective",
+          condition: "damaged",
+        }
+      ],
+      total_amount: products[0].price,
+      processed_by: adminUser._id,
+      notes: "Returning defective unit to supplier.",
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+    }
+  ]);
 
   // Seed OrderRequestItems
   for (const order of orderRequests) {

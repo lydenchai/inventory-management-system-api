@@ -13,6 +13,10 @@ const Notification = require("./Notification");
 const ApproveRequest = require("./ApproveRequest");
 const ConfirmDelivery = require("./ConfirmDelivery");
 const OrderRequestItem = require("./OrderRequestItem");
+const Location = require("./Location");
+const StockTransfer = require("./StockTransfer");
+const PurchaseOrder = require("./PurchaseOrder");
+const Return = require("./Return");
 
 module.exports = {
   User,
@@ -30,4 +34,8 @@ module.exports = {
   OrderRequestItem,
   ApproveRequest,
   ConfirmDelivery,
+  Location,
+  StockTransfer,
+  PurchaseOrder,
+  Return,
 };

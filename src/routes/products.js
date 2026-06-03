@@ -4,8 +4,10 @@ const productController = require('../controllers/productController');
 
 const authenticateToken = require('../middleware/auth');
 const { validateProduct } = require('../middleware/productValidator');
+const upload = require("../middleware/upload.middleware");
 
 router.get('/', authenticateToken, productController.getAll);
+router.post("/import", authenticateToken, upload.single("file"), productController.importProducts);
 router.get('/:id', authenticateToken, productController.getOne);
 router.post('/', authenticateToken, validateProduct, productController.create);
 router.patch('/:id', authenticateToken, productController.update);

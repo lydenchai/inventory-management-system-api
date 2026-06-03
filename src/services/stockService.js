@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Stock = require("../models/Stock");
 const Product = require("../models/Product");
+const emailService = require("./emailService");
 
 class StockService {
   async getAll({ page = 1, limit = 10, search = "", type = "", product = "", user = "", location = "", start_date = "", end_date = "" }) {
@@ -20,7 +21,7 @@ class StockService {
       where.user_id = user;
     }
     if (location && location !== "All Locations") {
-      where.location = location;
+      where.location_id = location;
     }
     if (search) {
       const products = await Product.find({
@@ -52,6 +53,7 @@ class StockService {
     const stocks = await Stock.find(where)
       .populate("product_id")
       .populate("user_id")
+      .populate("location_id")
       .limit(limit)
       .skip(offset)
       .sort({ completed_at: -1 });
@@ -60,8 +62,10 @@ class StockService {
       const obj = s.toJSON();
       obj.product = obj.product_id;
       obj.user = obj.user_id;
+      obj.location = obj.location_id;
       delete obj.product_id;
       delete obj.user_id;
+      delete obj.location_id;
       return obj;
     });
       
@@ -81,7 +85,8 @@ class StockService {
         quantity,
         reason,
         batch_number,
-        location,
+        location_id,
+        expiry_date,
         notes,
         completed_at,
         user_id,
@@ -122,6 +127,7 @@ class StockService {
 
       product.stock = newStock;
       await product.save({ session });
+      await emailService.checkAndAlertLowStock(product, session);
 
       const [stock] = await Stock.create(
         [{
@@ -132,7 +138,8 @@ class StockService {
           balance: newStock,
           reason,
           batch_number,
-          location,
+          location_id,
+          expiry_date,
           notes,
           completed_at: completed_at || new Date(),
         }],
@@ -161,7 +168,7 @@ class StockService {
       where.user_id = new mongoose.Types.ObjectId(query.user);
     }
     if (query.location && query.location !== "All Locations") {
-      where.location = query.location;
+      where.location_id = query.location;
     }
     if (query.search) {
       const products = await Product.find({
@@ -293,7 +300,8 @@ class StockService {
         type,
         batch_number,
         reason,
-        location,
+        location_id,
+        expiry_date,
         notes,
         status,
       } = data;
@@ -335,6 +343,7 @@ class StockService {
           newProduct.stock -= targetQuantity;
         }
         await newProduct.save({ session });
+        await emailService.checkAndAlertLowStock(newProduct, session);
         stock.balance = newProduct.stock;
       } else {
         if (targetType === "in") {
@@ -347,15 +356,17 @@ class StockService {
           product.stock -= targetQuantity;
         }
         await product.save({ session });
+        await emailService.checkAndAlertLowStock(product, session);
         stock.balance = product.stock;
       }
 
       stock.product_id = targetProductId;
       stock.quantity = targetQuantity;
       stock.type = targetType;
-      if (batch_number) stock.batch_number = batch_number;
+      if (batch_number !== undefined) stock.batch_number = batch_number;
       if (reason) stock.reason = reason;
-      if (location) stock.location = location;
+      if (location_id) stock.location_id = location_id;
+      if (expiry_date !== undefined) stock.expiry_date = expiry_date;
       if (notes) stock.notes = notes;
       if (status) stock.status = status;
 
@@ -389,6 +400,7 @@ class StockService {
           product.stock += Number(stock.quantity);
         }
         await product.save({ session });
+        await emailService.checkAndAlertLowStock(product, session);
       }
 
       await Stock.findByIdAndDelete(id).session(session);
