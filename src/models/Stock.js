@@ -1,82 +1,59 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Stock = sequelize.define(
-  "Stock",
+const stockSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     product_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "products",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
     },
     user_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     type: {
-      type: DataTypes.ENUM("in", "out"),
-      allowNull: false,
+      type: String,
+      enum: ['in', 'out'],
+      required: true,
     },
     quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: Number,
+      required: true,
     },
     balance: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 0,
+      type: Number,
+      default: 0,
     },
     batch_number: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     reason: {
-      type: DataTypes.ENUM(
-        "Purchase",
-        "Sale",
-        "Return",
-        "Adjustment",
-        "Damage",
-        "Other",
-      ),
-      allowNull: true,
+      type: String,
+      enum: ['Purchase', 'Sale', 'Return', 'Adjustment', 'Damage', 'Other'],
+      default: null,
     },
     location: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     notes: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     completed_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
+      type: Date,
+      default: null,
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      default: 'active',
+      required: true,
     },
   },
-  { timestamps: true, tableName: "stocks" },
+  { timestamps: true }
 );
 
+const Stock = mongoose.model('Stock', stockSchema);
 module.exports = Stock;

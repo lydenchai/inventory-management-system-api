@@ -1,25 +1,43 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Supplier = sequelize.define(
-  "Supplier",
+const supplierSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
+    company_name: {
+      type: String,
+      required: true,
     },
-    company_name: { type: DataTypes.STRING, allowNull: false },
-    location: { type: DataTypes.STRING, allowNull: false },
-    contact_person: { type: DataTypes.STRING, allowNull: false },
-    contact_position: { type: DataTypes.STRING, allowNull: false },
-    contact_email: { type: DataTypes.STRING, allowNull: true },
-    contact_phone: { type: DataTypes.STRING, allowNull: false },
-    address: { type: DataTypes.JSON, allowNull: true },
-    status: { type: DataTypes.STRING, allowNull: false, defaultValue: "active" },
+    location: {
+      type: String,
+      required: true,
+    },
+    contact_person: {
+      type: String,
+      required: true,
+    },
+    contact_position: {
+      type: String,
+      required: true,
+    },
+    contact_email: {
+      type: String,
+      default: null,
+    },
+    contact_phone: {
+      type: String,
+      required: true,
+    },
+    address: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
+    status: {
+      type: String,
+      default: 'active',
+      required: true,
+    },
   },
-  { timestamps: true, tableName: "suppliers" },
+  { timestamps: true }
 );
 
+const Supplier = mongoose.model('Supplier', supplierSchema);
 module.exports = Supplier;

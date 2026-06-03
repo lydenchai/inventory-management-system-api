@@ -1,48 +1,28 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Permission = sequelize.define(
-  "Permission",
+const permissionSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     description: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     permissions: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: ["view_dashboard"],
-      validate: {
-        isArrayOfStrings(value) {
-          if (
-            !Array.isArray(value) ||
-            !value.every((v) => typeof v === "string")
-          ) {
-            throw new Error("Permissions must be an array of strings");
-          }
-        },
-      },
+      type: [String],
+      default: ['view_dashboard'],
+      required: true,
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      default: 'active',
+      required: true,
     },
   },
-  {
-    timestamps: true,
-    tableName: "permissions",
-  },
+  { timestamps: true }
 );
 
+const Permission = mongoose.model('Permission', permissionSchema);
 module.exports = Permission;

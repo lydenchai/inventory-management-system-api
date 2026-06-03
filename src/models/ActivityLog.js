@@ -1,31 +1,31 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const ActivityLog = sequelize.define(
-  "ActivityLog",
+const activityLogSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     user_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    action: { type: DataTypes.STRING, allowNull: false },
-    details: { type: DataTypes.TEXT },
-    entity_type: { type: DataTypes.STRING },
-    entity_id: { type: DataTypes.STRING(24) },
+    action: {
+      type: String,
+      required: true,
+    },
+    details: {
+      type: String,
+      default: null,
+    },
+    entity_type: {
+      type: String,
+      default: null,
+    },
+    entity_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
   },
-  { timestamps: true, tableName: "activity_logs" },
+  { timestamps: true }
 );
 
+const ActivityLog = mongoose.model('ActivityLog', activityLogSchema);
 module.exports = ActivityLog;

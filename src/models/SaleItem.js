@@ -1,33 +1,40 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const SaleItem = sequelize.define(
-  "SaleItem",
+const saleItemSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
+    sale_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Sale',
+      required: true,
     },
-    sale_id: { type: DataTypes.STRING(24), allowNull: false },
     product_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "products",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
     },
-    quantity: { type: DataTypes.INTEGER, allowNull: false },
-    price: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    cost_price: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    discount: { type: DataTypes.DECIMAL(5, 2), defaultValue: 0 },
-    subtotal: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+    quantity: {
+      type: Number,
+      required: true,
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
+    cost_price: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
   },
-  { timestamps: true, tableName: "sale_items" },
+  { timestamps: true }
 );
 
+const SaleItem = mongoose.model('SaleItem', saleItemSchema);
 module.exports = SaleItem;

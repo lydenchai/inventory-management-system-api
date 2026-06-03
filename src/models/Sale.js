@@ -1,49 +1,56 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Sale = sequelize.define(
-  "Sale",
+const saleSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     customer_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     order_request_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "order_requests",
-        key: "_id",
-      },
-      onDelete: "SET NULL",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'OrderRequest',
+      default: null,
     },
-    total_amount: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    discount: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    grand_total: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
-    payment_method: { type: DataTypes.STRING, defaultValue: "Cash" },
-    payment_status: { type: DataTypes.STRING, defaultValue: "paid" },
-    notes: { type: DataTypes.TEXT },
-    status: { type: DataTypes.STRING, defaultValue: "Completed" },
-    completed_at: { type: DataTypes.DATE },
+    total_amount: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    grand_total: {
+      type: Number,
+      default: 0,
+    },
+    payment_method: {
+      type: String,
+      default: 'Cash',
+    },
+    payment_status: {
+      type: String,
+      default: 'paid',
+    },
+    notes: {
+      type: String,
+      default: null,
+    },
+    status: {
+      type: String,
+      default: 'Completed',
+    },
+    completed_at: {
+      type: Date,
+      default: null,
+    },
     is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
   },
-  { timestamps: true, tableName: "sales" },
+  { timestamps: true }
 );
 
+const Sale = mongoose.model('Sale', saleSchema);
 module.exports = Sale;

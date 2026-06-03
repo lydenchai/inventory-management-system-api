@@ -1,40 +1,40 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Expense = sequelize.define(
-  "Expense",
+const expenseSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
+    description: {
+      type: String,
+      required: true,
     },
-    description: { type: DataTypes.STRING, allowNull: false },
-    amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
+    amount: {
+      type: Number,
+      required: true,
+    },
     category: {
-      type: DataTypes.STRING,
-      defaultValue: "Other",
+      type: String,
+      default: 'Other',
     },
-    date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    receipt_image: { type: DataTypes.STRING },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    receipt_image: {
+      type: String,
+      default: null,
+    },
     user_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      default: 'active',
+      required: true,
     },
   },
-  { timestamps: true, tableName: "expenses" },
+  { timestamps: true }
 );
 
+const Expense = mongoose.model('Expense', expenseSchema);
 module.exports = Expense;

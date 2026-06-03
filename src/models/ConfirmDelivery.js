@@ -1,35 +1,36 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const ConfirmDelivery = sequelize.define(
-  "ConfirmDelivery",
+const confirmDeliverySchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     order_request_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "order_requests",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'OrderRequest',
+      required: true,
     },
-    status: { type: DataTypes.STRING, defaultValue: "approved" },
-    delivery_date: { type: DataTypes.DATE },
-    confirmed_by: { type: DataTypes.STRING(24) },
-    confirmed_at: { type: DataTypes.DATE },
+    status: {
+      type: String,
+      default: 'approved',
+    },
+    delivery_date: {
+      type: Date,
+      default: null,
+    },
+    confirmed_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    confirmed_at: {
+      type: Date,
+      default: null,
+    },
     is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
   },
-  { timestamps: true, tableName: "confirm_deliveries" },
+  { timestamps: true }
 );
 
+const ConfirmDelivery = mongoose.model('ConfirmDelivery', confirmDeliverySchema);
 module.exports = ConfirmDelivery;

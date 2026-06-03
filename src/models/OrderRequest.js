@@ -1,78 +1,82 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const OrderRequest = sequelize.define(
-  "OrderRequest",
+const orderRequestSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     supplier_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "suppliers",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Supplier',
+      required: true,
     },
     status: {
-      type: DataTypes.ENUM(
-        "pending",
-        "approved",
-        "rejected",
-        "completed",
-        "cancelled",
-        "on_hold",
-      ),
-      defaultValue: "pending",
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'completed', 'cancelled', 'on_hold'],
+      default: 'pending',
     },
-    notes: { type: DataTypes.STRING },
-    customer_remark: { type: DataTypes.STRING },
-    admin_remark: { type: DataTypes.STRING },
-    rejection_reason: { type: DataTypes.STRING },
-    delivery_date: { type: DataTypes.DATE },
+    notes: {
+      type: String,
+      default: null,
+    },
+    customer_remark: {
+      type: String,
+      default: null,
+    },
+    admin_remark: {
+      type: String,
+      default: null,
+    },
+    rejection_reason: {
+      type: String,
+      default: null,
+    },
+    delivery_date: {
+      type: Date,
+      default: null,
+    },
     requester_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    approved_by: DataTypes.STRING(24),
-    approved_date: { type: DataTypes.DATE },
-    // Alias for consistency with schema
-    approved_at: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        return this.getDataValue("approved_date");
-      },
-      set(value) {
-        this.setDataValue("approved_date", value);
-      },
+    approved_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
-    confirmed_by: { type: DataTypes.STRING(24) },
-    confirmed_at: { type: DataTypes.DATE },
+    approved_date: {
+      type: Date,
+      default: null,
+    },
+    confirmed_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    confirmed_at: {
+      type: Date,
+      default: null,
+    },
     notified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
     is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
   },
-  {
-    timestamps: true,
-    tableName: "order_requests",
-  },
+  { timestamps: true }
 );
 
+// Virtual for approved_at
+orderRequestSchema.virtual('approved_at').get(function() {
+  return this.approved_date;
+}).set(function(value) {
+  this.approved_date = value;
+});
+
+// Ensure virtuals are included in toJSON/toObject
+orderRequestSchema.set('toJSON', { virtuals: true });
+orderRequestSchema.set('toObject', { virtuals: true });
+
+const OrderRequest = mongoose.model('OrderRequest', orderRequestSchema);
 module.exports = OrderRequest;

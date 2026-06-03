@@ -1,31 +1,30 @@
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config({ path: require("path").join(__dirname, "../../.env") });
 const bcrypt = require("bcryptjs");
-const { sequelize } = require("../src/models");
-const {
-  User,
-  Product,
-  Stock,
-  Category,
-  Supplier,
-  Permission,
-  OrderRequest,
-  OrderRequestItem,
-  Notification,
-  ActivityLog,
-  ApproveRequest,
-  Sale,
-  SaleItem,
-  Expense,
-} = require("../src/models/associations");
+const mongoose = require("mongoose");
+const connectDB = require("../config/database");
+
+const User = require("../models/User");
+const Product = require("../models/Product");
+const Stock = require("../models/Stock");
+const Category = require("../models/Category");
+const Supplier = require("../models/Supplier");
+const Permission = require("../models/Permission");
+const OrderRequest = require("../models/OrderRequest");
+const OrderRequestItem = require("../models/OrderRequestItem");
+const Notification = require("../models/Notification");
+const ActivityLog = require("../models/ActivityLog");
+const ApproveRequest = require("../models/ApproveRequest");
+const Sale = require("../models/Sale");
+const SaleItem = require("../models/SaleItem");
+const Expense = require("../models/Expense");
 
 async function seed() {
-  // Disable foreign key checks, drop and recreate all tables
-  await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
-  await sequelize.sync({ force: true }); // Drops and recreates tables
-  await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
+  await connectDB();
+  console.log("Dropping database...");
+  await mongoose.connection.db.dropDatabase();
 
   // Seed categories
-  const categories = await Category.bulkCreate([
+  const categories = await Category.insertMany([
     {
       name: "Electronics",
       description: "Electronic devices and gadgets",
@@ -170,7 +169,7 @@ async function seed() {
   ]);
 
   // Seed suppliers
-  const suppliers = await Supplier.bulkCreate([
+  const suppliers = await Supplier.insertMany([
     {
       company_name: "TechVision Electronics Co., Ltd.",
       location: "Phnom Penh",
@@ -579,7 +578,7 @@ async function seed() {
       district: "Chamkar Mon",
       province: "Phnom Penh",
     },
-    profile: "https://avatars.githubusercontent.com/u/122275653?v=4",
+    profile: null,
     permission_id: adminPermission._id,
     user_type: "internal",
   });
@@ -691,7 +690,7 @@ async function seed() {
   });
 
   // seed products
-  const products = await Product.bulkCreate([
+  const products = await Product.insertMany([
     {
       code: "P001",
       name: "Laptop",
@@ -911,7 +910,7 @@ async function seed() {
   ]);
 
   // seed stocks
-  const stocks = await Stock.bulkCreate([
+  const stocks = await Stock.insertMany([
     // Laptop (P001) - Stock: 10
     {
       product_id: products[0]._id,
@@ -1023,9 +1022,9 @@ async function seed() {
   for (const product of products) {
     if (product.stock !== 0) {
       // Optimize: only update if changed
-      await Product.update(
-        { stock: product.stock },
-        { where: { _id: product._id } },
+      await Product.updateOne(
+        { _id: product._id },
+        { stock: product.stock }
       );
     }
   }
@@ -1221,11 +1220,10 @@ async function seed() {
       });
       totalAmount += subtotal;
     }
-    await sale.update({
-      total_amount: totalAmount,
-      grand_total: totalAmount,
-      payment_status: "paid",
-    });
+    sale.total_amount = totalAmount;
+    sale.grand_total = totalAmount;
+    sale.payment_status = "paid";
+    await sale.save();
   }
 
   // Seed Expenses with realistic descriptions

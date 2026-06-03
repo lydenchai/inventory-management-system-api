@@ -1,47 +1,35 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Notification = sequelize.define(
-  "Notification",
+const notificationSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     user_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
     type: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     message: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     entity_type: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     entity_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
     },
     read: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
   },
-  { timestamps: true, tableName: "notifications" },
+  { timestamps: true }
 );
 
+const Notification = mongoose.model('Notification', notificationSchema);
 module.exports = Notification;
