@@ -3,8 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-const { sequelize } = require("./models");
-require("./models/init");
+const connectDB = require("./config/database");
 
 const app = express();
 const path = require("path");
@@ -12,6 +11,7 @@ const path = require("path");
 // Security middleware
 app.use(
   helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -90,96 +90,12 @@ const PORT = process.env.PORT || 5001;
 
 async function startServer() {
   try {
-    // Attempt to clean up duplicate indexes on categories table before sync
-    try {
-      const [results] = await sequelize.query("SHOW INDEX FROM categories");
-      const nameIndexes = results.filter(
-        (idx) => idx.Column_name === "name" && idx.Key_name !== "PRIMARY",
-      );
-      const uniqueKeys = [...new Set(nameIndexes.map((idx) => idx.Key_name))];
-
-      // If we have too many indexes, drop them all and let sync recreate the correct one
-      if (uniqueKeys.length > 1) {
-        console.log(
-          `Found ${uniqueKeys.length} indexes on categories.name. Cleaning up...`,
-        );
-        for (const key of uniqueKeys) {
-          try {
-            await sequelize.query(`DROP INDEX \`${key}\` ON categories`);
-            console.log(`Dropped index: ${key}`);
-          } catch (e) {
-            console.error(`Failed to drop index ${key}:`, e.message);
-          }
-        }
-      }
-    } catch (e) {
-      // Ignore error if table doesn't exist yet
-      if (e.original && e.original.code !== "ER_NO_SUCH_TABLE") {
-        console.log("Index cleanup skipped for categories:", e.message);
-      }
-    }
-
-    // Attempt to clean up duplicate indexes on products table before sync
-    try {
-      const [results] = await sequelize.query("SHOW INDEX FROM products");
-      const codeIndexes = results.filter(
-        (idx) => idx.Column_name === "code" && idx.Key_name !== "PRIMARY",
-      );
-      const uniqueKeys = [...new Set(codeIndexes.map((idx) => idx.Key_name))];
-
-      if (uniqueKeys.length > 1) {
-        console.log(
-          `Found ${uniqueKeys.length} indexes on products.code. Cleaning up...`,
-        );
-        for (const key of uniqueKeys) {
-          try {
-            await sequelize.query(`DROP INDEX \`${key}\` ON products`);
-            console.log(`Dropped index: ${key}`);
-          } catch (e) {
-            console.error(`Failed to drop index ${key}:`, e.message);
-          }
-        }
-      }
-    } catch (e) {
-      if (e.original && e.original.code !== "ER_NO_SUCH_TABLE") {
-        console.log("Index cleanup skipped for products:", e.message);
-      }
-    }
-
-    // Attempt to clean up duplicate indexes on users table before sync
-    try {
-      const [results] = await sequelize.query("SHOW INDEX FROM users");
-      // Filter for email indexes
-      const userIndexes = results.filter(
-        (idx) => idx.Column_name === "email" && idx.Key_name !== "PRIMARY",
-      );
-      const uniqueKeys = [...new Set(userIndexes.map((idx) => idx.Key_name))];
-
-      if (uniqueKeys.length > 0) {
-        console.log(
-          `Found ${uniqueKeys.length} indexes on users (email). Cleaning up...`,
-        );
-        for (const key of uniqueKeys) {
-          try {
-            await sequelize.query(`DROP INDEX \`${key}\` ON users`);
-            console.log(`Dropped index: ${key}`);
-          } catch (e) {
-            console.error(`Failed to drop index ${key}:`, e.message);
-          }
-        }
-      }
-    } catch (e) {
-      if (e.original && e.original.code !== "ER_NO_SUCH_TABLE") {
-        console.log("Index cleanup skipped for users:", e.message);
-      }
-    }
-
-    await sequelize.sync({ alter: true });
+    await connectDB();
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("Failed to sync database:", err);
+    console.error("Failed to start server:", err);
   }
 }
 

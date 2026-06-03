@@ -81,7 +81,7 @@ SMTP_FROM=your_gmail_address@gmail.com
 - Generate an [App Password](https://myaccount.google.com/apppasswords) for your Gmail account and use it as `SMTP_PASS`.
 - `SMTP_USER` and `SMTP_FROM` must match the Gmail account for which you generated the App Password.
 - Do **not** use your regular Gmail password.
-- For a noreply address, create a dedicated Gmail account (e.g., `stockify.noreply@gmail.com`) and generate an App Password for it.
+- For a noreply address, create a dedicated Gmail account (e.g., `stock.management.noreply@gmail.com`) and generate an App Password for it.
 
 **Troubleshooting:**
 

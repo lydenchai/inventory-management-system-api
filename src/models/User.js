@@ -1,124 +1,110 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const User = sequelize.define(
-  "User",
+const userSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     first_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     last_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
+      match: [/\S+@\S+\.\S+/, 'is invalid'],
     },
     phone: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     role: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: "user",
+      type: String,
+      default: 'user',
     },
     user_type: {
-      type: DataTypes.ENUM("internal", "external"),
-      allowNull: false,
+      type: String,
+      enum: ['internal', 'external'],
+      required: true,
     },
     address: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
     profile: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     permission_id: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "permissions",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Permission',
+      default: null,
     },
     status: {
-      type: DataTypes.ENUM("active", "inactive", "pending"),
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      enum: ['active', 'inactive', 'pending'],
+      default: 'active',
+      required: true,
     },
     company_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     company_registration_no: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     request_purpose: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     expected_order_volume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     order_frequency: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     product_categories: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
     id_card_or_business_license: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     shop_photo: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     location_lat: {
-      type: DataTypes.DOUBLE,
-      allowNull: true,
+      type: Number,
+      default: null,
     },
     location_lng: {
-      type: DataTypes.DOUBLE,
-      allowNull: true,
+      type: Number,
+      default: null,
     },
     agree_terms: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
     note_from_customer: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
+      default: null,
     },
   },
   {
     timestamps: true,
-    tableName: "users",
-  },
+  }
 );
 
+const User = mongoose.model('User', userSchema);
 module.exports = User;

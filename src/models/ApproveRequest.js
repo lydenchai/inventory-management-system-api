@@ -1,55 +1,45 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const ApproveRequest = sequelize.define(
-  "ApproveRequest",
+const approveRequestSchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
-    },
     order_request_id: {
-      type: DataTypes.STRING(24),
-      allowNull: false,
-      references: {
-        model: "order_requests",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'OrderRequest',
+      required: true,
     },
-    status: { type: DataTypes.STRING, defaultValue: "pending" },
-    admin_remarks: { type: DataTypes.STRING },
-    rejection_reason: { type: DataTypes.STRING },
+    status: {
+      type: String,
+      default: 'pending',
+    },
+    admin_remarks: {
+      type: String,
+      default: null,
+    },
+    rejection_reason: {
+      type: String,
+      default: null,
+    },
     approved_by: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
     confirmed_by: {
-      type: DataTypes.STRING(24),
-      allowNull: true,
-      references: {
-        model: "users",
-        key: "_id",
-      },
-      onDelete: "RESTRICT",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
-    approved_date: { type: DataTypes.DATE },
+    approved_date: {
+      type: Date,
+      default: null,
+    },
     is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
   },
-  { timestamps: true, tableName: "approve_requests" },
+  { timestamps: true }
 );
 
+const ApproveRequest = mongoose.model('ApproveRequest', approveRequestSchema);
 module.exports = ApproveRequest;

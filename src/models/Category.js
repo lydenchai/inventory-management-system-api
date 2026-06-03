@@ -1,24 +1,27 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("./index");
-const { generateObjectId } = require("../utils/objectId.util");
+const mongoose = require('mongoose');
 
-const Category = sequelize.define(
-  "Category",
+const categorySchema = new mongoose.Schema(
   {
-    _id: {
-      type: DataTypes.STRING(24),
-      primaryKey: true,
-      defaultValue: () => generateObjectId(),
+    name: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    name: { type: DataTypes.STRING, allowNull: false, unique: true },
-    description: { type: DataTypes.STRING, allowNull: true },
+    description: {
+      type: String,
+      default: null,
+    },
     status: {
-      type: DataTypes.ENUM("active", "inactive"),
-      allowNull: false,
-      defaultValue: "active",
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active',
+      required: true,
     },
   },
-  { timestamps: true, tableName: "categories" },
+  {
+    timestamps: true,
+  }
 );
 
+const Category = mongoose.model('Category', categorySchema);
 module.exports = Category;
