@@ -37,11 +37,6 @@ Node.js backend for Inventory Management System using Express, Sequelize, and My
 
 ## Environment Variables
 
-- `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`: MySQL connection
-- `JWT_SECRET`, `REFRESH_SECRET`: JWT authentication
-
-## Environment Variables
-
 The following environment variables are required for the application:
 
 | Variable         | Description                                     |
@@ -88,25 +83,27 @@ SMTP_FROM=your_gmail_address@gmail.com
 - If you get authentication errors, double-check that the App Password is for the same account as `SMTP_USER`/`SMTP_FROM`.
 - Restart the backend server after updating `.env`.
 
-See `.env.example` for a template.
-
 ## Project Structure
 
-- `models/` - Sequelize models and associations
-- `routes/` - Express route definitions
+- `models/` - Sequelize models and database associations
+- `routes/` - Express route definitions (Products, Orders, Reports, Users, etc.)
 - `controllers/` - Route logic and business logic
-- `middleware/` - Authentication, RBAC, error handling
+- `middleware/` - Authentication, RBAC, file uploads, error handling
 - `public/uploads/` - User-uploaded files (ignored by git)
+- `scripts/` - Database seeding scripts
 - `index.js` - App entry point
 
 ## Features
 
-- User authentication (JWT, refresh tokens)
-- Role-based access control (RBAC) via Permission (role) model
-- CRUD for products, categories, suppliers, users, permissions
-- File upload support (profile images, etc.)
-- Pagination and filtering for list endpoints
-- Secure password hashing (bcrypt)
+- **Authentication & Security:** JWT-based auth with refresh tokens and secure password hashing (bcrypt).
+- **Role-Based Access Control (RBAC):** Fine-grained permissions (e.g., `view_product`, `create_order`) verified via middleware.
+- **Core Entities:** CRUD for Products, Categories, Suppliers, Users, and Permissions.
+- **Inventory Management:** Track Stocks (In/Out) with precise balance adjustments.
+- **Order Lifecycle:** Complete flow for Order Requests (Pending → Approved/Rejected → Delivered).
+- **Comprehensive Reports & Analytics:** Endpoints for Financial Summaries, Order Stats, Inventory Trends, and Dashboard Overviews.
+- **Activity Logging:** Automatic tracking of system actions (e.g., entity creation, updates, deletes) to an Activity Logs table.
+- **Standardized API:** Pagination, sorting, and dynamic filtering integrated natively into all listing endpoints.
+- **File Uploads:** Support for multipart form data (profile images, receipts, etc.).
 
 ## Role & Permission Model
 
@@ -115,26 +112,11 @@ See `.env.example` for a template.
 - All access control is enforced via middleware using this array.
 - To add new roles/permissions, update the Permission table and assign users accordingly.
 
-## File Uploads
+## API Usage Example
 
-- Uploaded files are stored in `public/uploads/` (ignored by git).
-- Ensure this directory exists and is writable by the server.
+All endpoints are prefixed with `/api`. Use JWT tokens for authenticated requests.
 
-## Seeding Data
-
-- Run `node scripts/seed.js` to populate the database with demo users, roles, permissions, categories, suppliers, and products.
-- You can modify `scripts/seed.js` to customize initial data.
-
-## API Usage
-
-- All endpoints are prefixed with `/api` (see `src/routes/`).
-- Use JWT tokens for authenticated requests (see login/register endpoints).
-- Example: `Authorization: Bearer <token>`
-
-## User Login Example
-
-To log in and receive a JWT access token:
-
+**Authentication Example:**
 ```
 POST /api/auth/login
 Content-Type: application/json
@@ -146,8 +128,7 @@ Content-Type: application/json
 ```
 
 **Response:**
-
-```
+```json
 {
   "success": true,
   "data": {
@@ -157,9 +138,9 @@ Content-Type: application/json
 }
 ```
 
-Use the `access_token` in the `Authorization` header for authenticated requests:
-
+Include the token in subsequent requests:
 ```
+GET /api/products
 Authorization: Bearer <access_token>
 ```
 
@@ -170,4 +151,4 @@ See [inventory-management-system-admin](https://github.com/lydenchai/inventory-m
 ## Notes
 
 - Do not commit sensitive data or uploaded files.
-- For production, use a persistent store for refresh tokens and configure CORS as needed.
+- For production, use a persistent store for refresh tokens and configure CORS properly.
