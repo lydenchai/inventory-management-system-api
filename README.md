@@ -85,13 +85,14 @@ SMTP_FROM=your_gmail_address@gmail.com
 
 ## Project Structure
 
-- `models/` - Sequelize models and database associations
-- `routes/` - Express route definitions (Products, Orders, Reports, Users, etc.)
-- `controllers/` - Route logic and business logic
-- `middleware/` - Authentication, RBAC, file uploads, error handling
+- `src/modules/` - Feature-based domain modules (Inventory, Products, Purchasing, Sales, System, Reports)
+  - Each module contains its own `models/`, `controllers/`, and `routes/`
+- `src/middleware/` - Global middleware (Authentication, RBAC, error handling)
+- `src/config/` - Database and application configuration
+- `src/utils/` - Shared utility functions
 - `public/uploads/` - User-uploaded files (ignored by git)
 - `scripts/` - Database seeding scripts
-- `index.js` - App entry point
+- `src/index.js` - App entry point
 
 ## Features
 
