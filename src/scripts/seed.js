@@ -399,6 +399,11 @@ async function seed() {
       "create_product",
       "update_product",
       "delete_product",
+      // Locations
+      "view_location",
+      "create_location",
+      "update_location",
+      "delete_location",
       // Suppliers
       "view_supplier",
       "create_supplier",
@@ -447,6 +452,16 @@ async function seed() {
       "create_user",
       "update_user",
       "delete_user",
+      // Stock Transfers
+      "view_stock_transfer",
+      "create_stock_transfer",
+      // Returns
+      "view_return",
+      "create_return",
+      // Purchase Orders
+      "view_purchase_order",
+      "create_purchase_order",
+      "update_purchase_order",
     ],
   });
 
