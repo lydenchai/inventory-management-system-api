@@ -63,6 +63,11 @@ const orderRequestSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    updated_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
   },
   { timestamps: true }
 );
