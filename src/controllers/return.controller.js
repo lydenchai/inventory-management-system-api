@@ -4,7 +4,7 @@ const emailService = require('../services/emailService');
 
 exports.createReturn = async (req, res) => {
   const session = await mongoose.startSession();
-  session.startTransaction();
+  // session.startTransaction();
 
   try {
     const { type, sale_id, supplier_id, items, location_id, notes } = req.body;
@@ -86,12 +86,12 @@ exports.createReturn = async (req, res) => {
       }
     }
 
-    await session.commitTransaction();
+    // await session.commitTransaction();
     session.endSession();
 
     res.status(201).json({ success: true, data: newReturn });
   } catch (error) {
-    await session.abortTransaction();
+    // await session.abortTransaction();
     session.endSession();
     console.error('Error creating return:', error);
     res.status(500).json({ success: false, error: error.message });

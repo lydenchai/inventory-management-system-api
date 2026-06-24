@@ -77,7 +77,7 @@ class StockService {
 
   async create(data, reqUserId) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const {
         product_id,
@@ -146,11 +146,11 @@ class StockService {
         { session },
       );
 
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
       return stock;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }
@@ -292,7 +292,7 @@ class StockService {
 
   async update(id, data) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const {
         product_id,
@@ -371,12 +371,12 @@ class StockService {
       if (status) stock.status = status;
 
       await stock.save({ session });
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
 
       return stock;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }
@@ -384,7 +384,7 @@ class StockService {
 
   async remove(id) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const stock = await Stock.findById(id).session(session);
       if (!stock) {
@@ -404,11 +404,11 @@ class StockService {
       }
 
       await Stock.findByIdAndDelete(id).session(session);
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
       return true;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }

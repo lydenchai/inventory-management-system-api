@@ -164,7 +164,7 @@ class SaleService {
 
   async create(data, reqUserId) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const { items, customer_id, payment_method, notes } = data;
 
@@ -251,11 +251,11 @@ class SaleService {
       sale.payment_status = data.payment_status || "paid";
       await sale.save({ session });
 
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
       return sale;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }
@@ -263,7 +263,7 @@ class SaleService {
 
   async update(id, data, reqUserId) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const sale = await Sale.findById(id).session(session);
 
@@ -360,7 +360,7 @@ class SaleService {
       sale.is_active = is_active !== undefined ? is_active : sale.is_active;
       await sale.save({ session });
 
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
 
       const updatedSale = await Sale.findById(id).populate("customer_id");
@@ -378,7 +378,7 @@ class SaleService {
 
       return obj;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }
@@ -386,7 +386,7 @@ class SaleService {
 
   async remove(id, reqUserId) {
     const session = await mongoose.startSession();
-    session.startTransaction();
+    // session.startTransaction();
     try {
       const sale = await Sale.findById(id).session(session);
 
@@ -423,11 +423,11 @@ class SaleService {
       }
 
       await Sale.findByIdAndDelete(id).session(session);
-      await session.commitTransaction();
+      // await session.commitTransaction();
       session.endSession();
       return true;
     } catch (err) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       session.endSession();
       throw err;
     }
